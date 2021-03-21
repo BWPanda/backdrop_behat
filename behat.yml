@@ -1,0 +1,15 @@
+default:
+  suites:
+    default:
+      contexts:
+        - FeatureContext
+        - Behat\MinkExtension\Context\MinkContext
+  extensions:
+    DMore\ChromeExtension\Behat\ServiceContainer\ChromeExtension: ~
+    Behat\MinkExtension:
+      base_url: http://backdrop-behat.lndo.site
+      default_session: goutte
+      javascript_session: chrome
+      goutte: ~
+      chrome:
+        api_url: http://chrome:9222

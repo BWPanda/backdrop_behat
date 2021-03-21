@@ -1,0 +1,6 @@
+{
+    "require": {
+        "dmore/behat-chrome-extension": "^1.3",
+        "behat/mink-goutte-driver": "^1.2"
+    }
+}

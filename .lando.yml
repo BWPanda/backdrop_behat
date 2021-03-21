@@ -1,0 +1,33 @@
+name: backdrop-behat
+recipe: backdrop
+config:
+  webroot: www
+  backdrush: 1.x-1.x
+services:
+  appserver:
+    build:
+      - wget -q --show-progress https://github.com/backdrop/backdrop/archive/refs/heads/1.x.zip
+      - unzip -q 1.x.zip && rm 1.x.zip
+      - mv backdrop-1.x/ /app/www/
+    run:
+      - cd /app/www && ./core/scripts/install.sh --account-pass=password --db-url=mysql://backdrop:backdrop@database/backdrop
+      - composer install
+  chrome:
+    type: compose
+    services:
+      image: registry.gitlab.com/dmore/docker-chrome-headless:7.3
+      command: chromium --window-size="1920,1080" --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --no-sandbox --disable-dev-shm-usage
+events:
+  pre-rebuild:
+    - rm -rf /app/www /app/vendor /app/composer.lock
+    - mysql -h database -u root -e "DROP DATABASE backdrop; CREATE DATABASE backdrop; GRANT ALL PRIVILEGES ON backdrop.* TO 'backdrop'@'%' IDENTIFIED by 'backdrop';"
+  pre-destroy:
+    - rm -rf /app/www /app/vendor /app/composer.lock
+tooling:
+  drush:
+    service: appserver
+    cmd: drush --root=/app/www --uri=http://backdrop-behat.lndo.site
+  behat:
+    service: appserver
+    description: "Run Behat tests"
+    cmd: /app/vendor/bin/behat
